@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Connect to the PostgreSQL database and retrieve the Tailscale authentication key
+key=$(psql tailscale_keys -t -c "SELECT ts_key FROM keys LIMIT 1" | tr -d ' ')
+
+# Write the authentication key to a file
+echo "$key" > ~/.tailscale/authkey
+
+# Set the permissions on the authentication key file
+chmod 600 ~/.tailscale/authkey
+
+# Authenticate to Tailscale using the authentication key
+tailscale up
+
