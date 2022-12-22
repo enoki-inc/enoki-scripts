@@ -4,7 +4,7 @@
 message=$(zenity --entry --text "What message do you want to send to your team?:")
 
 # Set the API URL
-api_url="https://example.com/api/send_message"
+api_url="https://enoki.so/api/slack"
 
 # Send a POST request to the API with the message as the request body
 curl -X POST -H "Content-Type: application/json" -d "{\"message\":\"$message\"}" $api_url
