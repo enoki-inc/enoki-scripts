@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Connect to the PostgreSQL database and retrieve the SSH key
+key=$(psql ssh_keys -t -c "SELECT ssh_key FROM keys LIMIT 1" | tr -d ' ')
+
+# Write the SSH key to a file
+echo "$key" > ~/.ssh/id_rsa
+
+# Set the permissions on the SSH key file
+chmod 600 ~/.ssh/id_rsa
+
+# Open a pop-up dialog box to prompt the user for the username and IP address or hostname
+input=$(zenity --forms --title "SSH Login" --text "Enter the login details:" \
+  --separator="," --add-entry="Username" --add-entry="IP Address or Hostname")
+
+# Split the input into the username and IP address or hostname
+IFS="," read -r username ip_or_hostname <<< "$input"
+
+# Log in to the machine using OpenSSH
+ssh "$username@$ip_or_hostname"
+
+
