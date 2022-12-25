@@ -1,22 +1,35 @@
 #!/bin/bash
 
-# Connect to the PostgreSQL database and retrieve the SSH key
-key=$(psql ssh_keys -t -c "SELECT ssh_key FROM keys LIMIT 1" | tr -d ' ')
+# Set the RDS hostname, database name, username, and password
+RDS_HOSTNAME=my-rds-hostname
+DB_NAME=my_database
+USERNAME=my_username
+PASSWORD=my_password
+
+# Set the table and column names for the SSH key
+TABLE_NAME=ssh_keys
+COLUMN_NAME=ssh_key
+
+# Retrieve the SSH key from the RDS database
+SSH_KEY=$(psql -h $RDS_HOSTNAME -U $USERNAME -d $DB_NAME -c "SELECT $COLUMN_NAME FROM $TABLE_NAME WHERE id=1;" -tA)
+
+# Check if the SSH key was retrieved successfully
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to retrieve SSH key from RDS database"
+  exit 1
+fi
 
 # Write the SSH key to a file
-echo "$key" > ~/.ssh/id_rsa
+echo "$SSH_KEY" > ~/.ssh/id_rsa
 
 # Set the permissions on the SSH key file
 chmod 600 ~/.ssh/id_rsa
 
 # Open a pop-up dialog box to prompt the user for the username and IP address or hostname
-input=$(zenity --forms --title "SSH Login" --text "Enter the login details:" \
-  --separator="," --add-entry="Username" --add-entry="IP Address or Hostname")
+zenity --entry --title "Enter Connection Details" --text "Username:" --entry-text "user" > /dev/null 2>&1
+read -r USERNAME
+zenity --entry --title "Enter Connection Details" --text "IP address or hostname:" --entry-text "host" > /dev/null 2>&1
+read -r REMOTE_HOSTNAME
 
-# Split the input into the username and IP address or hostname
-IFS="," read -r username ip_or_hostname <<< "$input"
-
-# Log in to the machine using OpenSSH
-ssh "$username@$ip_or_hostname"
-
-
+# Connect to the remote machine using the SSH key and OpenSSH
+ssh -i ~/.ssh/id_rsa -o "UseOpenSSH=yes" $USERNAME@$REMOTE_HOSTNAME
