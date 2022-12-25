@@ -1,14 +1,23 @@
 #!/bin/bash
 
-# Connect to the PostgreSQL database and retrieve the Tailscale authentication key
-key=$(psql tailscale_keys -t -c "SELECT ts_key FROM keys LIMIT 1" | tr -d ' ')
+# Set the RDS hostname, database name, username, and password
+RDS_HOSTNAME=my-rds-hostname
+DB_NAME=my_database
+USERNAME=my_username
+PASSWORD=my_password
 
-# Write the authentication key to a file
-echo "$key" > ~/.tailscale/authkey
+# Set the table and column names for the Tailscale key
+TABLE_NAME=tailscale_keys
+COLUMN_NAME=tailscale_key
 
-# Set the permissions on the authentication key file
-chmod 600 ~/.tailscale/authkey
+# Retrieve the Tailscale key from the RDS database
+TAILSCALE_KEY=$(psql -h $RDS_HOSTNAME -U $USERNAME -d $DB_NAME -c "SELECT $COLUMN_NAME FROM $TABLE_NAME WHERE id=1;" -tA)
 
-# Authenticate to Tailscale using the authentication key
-tailscale up
+# Check if the Tailscale key was retrieved successfully
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to retrieve Tailscale key from RDS database"
+  exit 1
+fi
 
+# Authenticate with Tailscale using the key
+tailscale up --authkey="$TAILSCALE_KEY"
