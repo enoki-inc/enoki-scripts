@@ -1,4 +1,4 @@
-#create s3 bucket automatically with team's name as name of s3 bucket sourced from postgresql db in aws rds 
+#lambda function to create s3 bucket automatically with team's name as name of s3 bucket sourced from postgresql db in aws rds 
 import boto3
 import psycopg2
 
