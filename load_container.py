@@ -1,5 +1,13 @@
 #lambda function for "loading" container with the appropriate docker image and with the minimum recommend pc specs"
 
+#example use case
+#curl -X POST -H "Content-Type: application/json" -d '{
+#    "container_name": "aither",
+#    "image_name": "enokiinc/aither",
+#    "cluster_arn": "arn:aws:ecs:us-east-1:123456789012:cluster/aither-cluster"
+#}' https://lambda-function-url
+
+
 import boto3
 
 def lambda_handler(event, context):
