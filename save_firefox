@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Get the ID of the Firefox window
+firefox_window=$(swaymsg -t get_tree | jq '.. | select(.name=="Firefox") | .id')
+
+# Initialize an empty array to store URLs
+urls=()
+
+# Loop through each Firefox window
+for window_id in $firefox_window; do
+    # Get the URLs of all tabs in the current Firefox window
+    window_urls=$(swaymsg -t get_tree | jq -r ".[] | select(.id==$window_id) | .app_id")
+    # Add the URLs to the array
+    urls+=($window_urls)
+done
+
+# Print the URLs
+echo ${urls[@]}
+
+#save the URLs to a file
+echo ${urls[@]} > firefox_tabs.txt
+

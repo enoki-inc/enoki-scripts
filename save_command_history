@@ -1,0 +1,3 @@
+#!/bin/bash
+history > terminal_history.txt
+

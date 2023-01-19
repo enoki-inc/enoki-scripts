@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Check if the terminal_history.txt file exists
+if [ ! -f terminal_history.txt ]; then
+    echo "Error: terminal_history.txt not found."
+    exit 1
+fi
+
+# Use the `cat` command to read the terminal_history.txt file and append it to the current terminal history
+cat terminal_history.txt >> ~/.ash_history # need to change HISTFILE location
+
+# Open a new terminal window
+alacritty
+

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Check if the open_tabs.txt file exists
+if [ ! -f open_tabs.txt ]; then
+    echo "Error: open_tabs.txt not found."
+    exit 1
+fi
+
+# Read the open_tabs.txt file and store the URLs in an array
+urls=()
+while IFS= read -r line; do
+    urls+=("$line")
+done < open_tabs.txt
+
+# Open Firefox and open all the URLs in the array
+firefox "${urls[@]}" &
+
